@@ -104,3 +104,4 @@ dist
 .tern-port
 node_modules
 session1.data.json
+session.data.json
