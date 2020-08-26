@@ -9,7 +9,7 @@ const msgHandler = async (client,message) => {
     const {id, pushname} = sender
     const {name} = chat
     const time = moment(t * 1000).format('DD/MM HH:mm:ss')
-    const commands = ['#sticker', '#hallo']
+    const commands = ['/help', '/hallo']
     const cmds = commands.map(x => x + '\\b').join('|')
     const cmd = type === 'chat' ? body.match(new RegExp(cmds, 'gi')) : type === 'image' && caption ? caption.match(new RegExp(cmds, 'gi')) : ''
     
@@ -18,8 +18,18 @@ const msgHandler = async (client,message) => {
       if (isGroupMsg) console.log('[EXEC]', color(time, 'yellow'), color(cmd[0]), 'from', color(pushname), 'in', color(name))
       const args = body.trim().split(' ')
       switch (cmd[0]) {
-        case '#hallo':
-          mqttClient.publish('mytopic','hi')
+        case '/help':
+          var message = `\`\`\`
+            *List Perintah*\n
+            \n
+            */daftarperangkat[nomor_serial][plat_nomor]* : digunakan untuk mendaftarkan perangkat anda dengan nomor whatsapp
+              anda untuk mendapatkan notifikasi atau fitur lainya, contoh penggunaan : _/daftarperangkat,123456,D 5443 AB_\n
+            */lokasi* :\n
+            */matikankendaraan* :\n
+            */status* :\n
+				*/kuncikendaraan* :
+				\`\`\`
+          `
           await client.sendText(from, 'Hai')
           break;
       }
