@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  mosquitto:
+    image: eclipse-mosquitto:1.6.7
+    hostname: rizkifreao_mqtt
+    container_name: mqtt_kendaraan
+    ports:
+      - 1883:1883
+      - 9001:9001
+    networks:
+      - default
+networks:
+   default:
+    ipam:
+      config:
+       - subnet: 157.230.35.21/24
