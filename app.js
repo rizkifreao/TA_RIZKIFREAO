@@ -43,6 +43,10 @@ const start = async (client) => {
   })
 }
 
+app.get('/',(req,res)=>{
+  res.send("<h1> Selamat datang di Whatsapp MQTT Api ... </h1>")
+})
+
 create(serverOption).then(async client => await start(client))
   .catch(e => {
     console.log('Error', e.message);
