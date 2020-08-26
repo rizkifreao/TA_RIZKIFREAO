@@ -19,7 +19,7 @@ const msgHandler = async (client,message) => {
       const args = body.trim().split(' ')
       switch (cmd[0]) {
         case '/help':
-          var message = `\`\`\`
+          var respon = `\`\`\`
             *List Perintah*\n
             \n
             */daftarperangkat[nomor_serial][plat_nomor]* : digunakan untuk mendaftarkan perangkat anda dengan nomor whatsapp
@@ -30,7 +30,7 @@ const msgHandler = async (client,message) => {
 				*/kuncikendaraan* :
 				\`\`\`
           `
-          await client.sendText(from, 'Hai')
+          await client.sendText(from, respon)
           break;
       }
     }else{
