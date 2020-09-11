@@ -42,27 +42,29 @@ Mqtt_Controller.subscribe = (client,topic) => {
 
 
 Mqtt_Controller.callback = async (topic, message, whatsapp) => {
-  var payload = JSON.parse(message)
-  
-  switch (payload.perintah) {
+  var msg = message.toString();
+  var payload = {
+    from: "6283101194384@c.us"
+  }
+
+  switch (topic) {
     // example
     // {"from":"6283101194384@c.us","perintah":"status","value":{"lat":"-6","lng":"100","loc":"Bandung"}}
-    case "lokasi":
-      var value = payload.value
+    case "whatsapp/in/lokasi":
+      var value = msg.split(",")
       var callback = "*==== SUKSES ====*\n\n"+
-      "\`\`\`Latitude : "+value.lat+"\`\`\`\n"+
-      "\`\`\`Laogtitude : "+ value.lng + "\`\`\`\n"
+      "\`\`\`Latitude : "+value[1]+"\`\`\`\n"+
+      "\`\`\`Laogtitude : "+ value[2] + "\`\`\`\n"
 
-      await whatsapp.sendText(payload.from,callback)
-      await whatsapp.sendLocation(payload.from,value.lat,value.lng,"asdasdasdasdasdsadsad")
+      await whatsapp.sendText("6283101194384@c.us", callback)
+      await whatsapp.sendLocation("6283101194384@c.us", value[1], value[2], "")
     break;
 
-    case "mesin":
+    case "whatsapp/in/mesin":
        // {"from":"6283101194384@c.us","perintah":"mesin","value":{"relay":"0"}}
-      var value = payload.value
       var callback = ""
 
-      if (value.relay == "0") {
+      if (msg == "0") {
         callback = "*==== SUKSES ====*\n\n" +
           "\`\`\`Kelistrikan mesin berhasil di aktifkan\`\`\`\n"+
           "\`\`\`Status : 1\`\`\`"
@@ -75,12 +77,11 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
       await whatsapp.sendText(payload.from, callback)
     break;
 
-    case "kunci":
+    case "whatsapp/in/kunci":
       // {"from":"6283101194384@c.us","perintah":"kunci","value":{"kunci":"1"}}
-      var value = payload.value
       var callback = ""
 
-      if (value.kunci == "1") {
+      if (msg == "1") {
         callback = "*==== SUKSES ====*\n\n" +
           "\`\`\`Sistem keamanan berhasil di aktifkan\`\`\`\n"+
           "\`\`\`Status : 1\`\`\`"
@@ -93,19 +94,35 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
       await whatsapp.sendText(payload.from, callback)
     break;
 
-    case "status":
-    // {"from":"6283101194384@c.us","perintah":"status","value":{"kunci":"1","mesin":"1","lat":"1","lng":"1","batt":"1"}}
-    var value = payload.value
-    var callback = callback = "*Status Informasi*\n\n" +
-      "\`\`\`Keamanan : 1\`\`\`\n" +
-      "\`\`\`Mesin : 1\`\`\`\n" +
-      "\`\`\`Latitude : 1\`\`\`\n" +
-      "\`\`\`Longtitude : 1\`\`\`\n" +
-      "\`\`\`Batterai : 1\`\`\`\n" +
-      "\`\`\`http://maps.google.com/maps?q=lat,long\`\`\`"
+    case "whatsapp/in/status":
+      // {"from":"6283101194384@c.us","perintah":"status","value":{"kunci":"1","mesin":"1","lat":"1","lng":"1","batt":"1"}}
+      var value = payload.value
+      var callback = callback = "*Status Informasi*\n\n" +
+        "\`\`\`Keamanan : 1\`\`\`\n" +
+        "\`\`\`Mesin : 1\`\`\`\n" +
+        "\`\`\`Latitude : 1\`\`\`\n" +
+        "\`\`\`Longtitude : 1\`\`\`\n" +
+        "\`\`\`Batterai : 1\`\`\`\n" +
+        "\`\`\`http://maps.google.com/maps?q=lat,long\`\`\`"
 
-    await whatsapp.sendText(payload.from, callback)
+      await whatsapp.sendText(payload.from, callback)
     break;
   }
-  console.log(payload);
+
+  if (topic == "whatsapp/notifikasi") {
+    var callback = ""
+    if (msg == "aki") {
+      callback = "*==== PERINGATAN ====*\n\n"+
+      "\`\`\`Sensor mendeteksi bahwa aki baterai telah dilepas, Segera periksa kendaraan anda\`\`\`"
+    } else if (msg == "kunci_kontak"){
+      callback = "*==== PERINGATAN ====*\n\n" +
+        "\`\`\`Sensor mendeteksi kunci kontak dinyalakan, Segera periksa kendaraan anda\`\`\`"
+    } else if (msg == "getar"){
+      callback = "*==== PERINGATAN ====*\n\n" +
+        "\`\`\`Sensor mendeteksi adanya gerakan pada kendaraan anda, Segera periksa kendaraan anda\`\`\`"
+    }
+
+    await whatsapp.sendText(payload.from, callback)
+  }
+  console.log(msg);
 }

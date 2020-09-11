@@ -42,9 +42,14 @@ const char gprsPass[] = "";
 // MQTT details
 const char* broker = "157.230.35.21";           // Sesuaikan dengan alamat IP broker
 
-const char* topicLed = "GsmClientTest/led";
+
 const char* topicInit = "GsmClientTest/init";
-const char* topicled1Status = "GsmClientTest/led1Status";
+const char* topicGetLokasi = "whatsapp/out/lokasi";
+const char* topicGetMesin = "whatsapp/out/mesin";
+const char* topicGetKunci = "whatsapp/out/kunci";
+const char* topicGetStatus = "whatsapp/out/status";
+const char* topicReport = "whatsapp/in";
+const char* topicNotifikasi = "whatsapp/notifikasi";
 
 /*start gps*/
 const char* deviceID = "device001";
@@ -52,12 +57,17 @@ const char* topicNdoware = "ndoware";             // Sesuaikan dengan topik yang
 
 #define DEBUG false
 //char type[32], no1[32], no2[32], date[32], lat[32], lon[32];
+char dataGPS[48];
 long lastGetGPStAttempt = 0;
 /*end gps*/
 
 #include <TinyGsmClient.h>
-#include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <PubSubClient.h>
+
+//char data[80];
+//StaticJsonBuffer<200> jsonBuffer;
+StaticJsonDocument<250> wrapper;
 
 #ifdef DUMP_AT_COMMANDS
 #include <StreamDebugger.h>
@@ -69,21 +79,33 @@ TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
 PubSubClient mqtt(client);
 
-#define RELAY_PIN11 7 //TERHUBUNG MESIN
-#define RELAY_PIN12 6
-#define RELAY_PIN13 5
-#define RELAY_PIN14 4
+#define RELAY_PIN1 7 //TERHUBUNG MESIN
+#define RELAY_PIN2 6
+#define RELAY_PIN3 5
+#define RELAY_PIN4 4
 
 #define SENSV_PIN1 A0
 #define SENSV_PIN2 A1
 
+#define PIN_SENS_GETAR 8
+
+
 float SENS1_OUT = 0.0; //Battery
 float SENS1_IN = 0.0;
 unsigned int SENS1_VAL = 0;
+bool SENS1_STAT = true;
+
+int sens_getar_val = 0;
+
+int status_kunci = 0;
+int status_relay = 1;
+
+bool kirim_notifGetar = true;
 
 float SENS2_OUT = 0.0; //Kunci Kontak
 float SENS2_IN = 0.0;
 unsigned int SENS2_VAL = 0;
+bool SENS2_STAT = true;
 
 float R1 = 30000.0;
 float R2 = 7500.0;
@@ -96,29 +118,88 @@ int relay4Status = HIGH;
 long lastReconnectAttempt = 0;
 long waktuAkhirSensorV = 0;
 
-char data[80];
-
-void mqttCallback(char* topic, byte* payload, unsigned int len) {
+void mqttCallback(char* topic, byte* payload, int len) {
 
   SerialMon.print(F("Message arrived ["));
   SerialMon.print(topic);
   SerialMon.print(F("]: "));
   SerialMon.write(payload, len);
-  SerialMon.println(topicLed);
   SerialMon.println();
 
-  if (String(topic) == "whatsapp/out") {
-//    relay1Status = !relay1Status;
-//    digitalWrite(RELAY_PIN11, relay1Status);
-//    mqtt.publish(topicled1Status, relay1Status ? "1" : "0");
-//      SerialMon.write(payload, len);
-  }
-  
-  if (String(topic) == "whatsapp/out") {
+//  char buffer[256];
+
+  //  const size_t capacity = JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(4) + 90;
+  //  StaticJsonDocument<capacity> doc;
+  //  deserializeJson(doc, payload, len);
+  //  char buffer[256];
+  //
+  //  Serial.println(doc["from"].as<char*>());
+  //  Serial.println(doc["cmd"].as<char*>());
+  //  Serial.println(doc["deviceID"].as<char*>());
+
+  //  if(doc["perintah"] == "lokasi"){
+  //     Serial.println("BATAS");
+  //  }
+  //  Serial.println("BATAS");
+
+  if (strcmp(topic, topicGetLokasi) == 0) {
+    Serial.println(F("KIRIM LOKASI"));
+    mqtt.publish((char*)"whatsapp/in/lokasi", dataGPS);
+
+  } else if (strcmp(topic, topicGetMesin) == 0) {
     relay1Status = !relay1Status;
-    digitalWrite(RELAY_PIN11, relay1Status);
-    mqtt.publish(topicled1Status, relay1Status ? "1" : "0");
+    digitalWrite(RELAY_PIN1, relay1Status);
+    mqtt.publish("whatsapp/in/mesin", relay1Status ? "0" : "1");
+
+  } else if (strcmp(topic, topicGetKunci) == 0) {
+    status_kunci = !status_kunci;
+    if(status_kunci == 0){
+      SENS1_STAT = true;
+      SENS2_STAT = true;
+      kirim_notifGetar = true;
+      digitalWrite(RELAY_PIN1, HIGH);
+      relay1Status = HIGH;
+    }
+//    digitalWrite(RELAY_PIN1, relay1Status);
+    //    Serial.println(status_kunci);
+    mqtt.publish("whatsapp/in/kunci", status_kunci?"1":"0");
   }
+//  else if (strcmp(topic, topicGetStatus) == 0) {
+//    uint8_t chargeState = -99;
+//    int8_t percent = -99;
+//    uint16_t milliVolts = -9999;
+//    modem.getBattStats(chargeState, percent, milliVolts);
+//    char cpercent[4];
+//    char sens[8];
+//    dtostrf(SENS1_OUT, 6, 2, sens);
+//    char stat_info[250];
+//    strcpy(stat_info, deviceID);
+//    strcat(stat_info, ",");
+//    strcat(stat_info, status_kunci);
+//    strcat(stat_info, ",");
+//    strcat(stat_info, relay1Status);
+//    strcat(stat_info, ",");
+//    strcat(stat_info, itoa(percent, cpercent, 10));
+//    mqtt.publish("whatsapp/in/status", stat_info);
+//  }
+
+//  if (strcmp(topic, "coba") == 0) {
+//
+//    //    StaticJsonDocument<200> res;
+//
+//    //
+//    //    wrapper["lat"] = lat;
+//    //    wrapper["lng"] = lon;
+//    //    wrapper["spd"] = String("20");
+//    //    size_t n = serializeJson(wrapper, buffer);
+//    //    //    char payload[c + 2];  //+2 ? not sure about that
+//    //    //    serializeJson(res, payload);
+//    //    mqtt.publish("Cobian/weh", buffer, n);
+//    //    getSendGPS();
+//    //      relay1Status = !relay1Status;
+//    //      digitalWrite(RELAY_PIN11, relay1Status);
+//    //    mqtt.publish("coba/aja", "COBAIN");
+//  }
 }
 
 boolean mqttConnect() {
@@ -139,12 +220,13 @@ boolean mqttConnect() {
 
   SerialMon.println(F(" ++BERHASIL++"));
 
-  //  String payload = "{ \"devices\": \" "+ String(deviceID) +"\",\"status\": \"Connected\"}";
-  //  payload.toCharArray(data, (payload.length() + 1));
-  char* respons = " Connected";
-  mqtt.publish(topicInit, strcat(deviceID, " Connected"));
+  //  mqtt.publish(topicInit, strcat(deviceID, " Connected"));
   //  mqtt.publish(topicInit, deviceID + (const char*)" Connected" );
-  mqtt.subscribe(topicLed);
+  mqtt.subscribe(topicGetLokasi);
+  mqtt.subscribe(topicGetMesin);
+  mqtt.subscribe(topicGetKunci);
+  mqtt.subscribe(topicGetStatus);
+  mqtt.subscribe("coba");
   return mqtt.connected();
 }
 
@@ -168,7 +250,7 @@ void getSendGPS() {
   Serial.print("GPS raw data:"); Serial.println(gps_raw);
   // GPS raw data: 1,1,20200204092314.000,-6.317693,107.017000,61.000,0.02,316.5,1,,1.0,1.8,1.5,,13,11,,,46,,
 
-  char no1[32], no2[32], date[32], lat[32], lon[32];
+  char no1[32], no2[32], date[32], lat[32], lon[32], spd[12];
   //    , alt[12], spd[12];
   char* buf = gps_raw.c_str();
   strcpy(no1, strtok(buf , ","));
@@ -176,6 +258,7 @@ void getSendGPS() {
   strcpy(date , strtok(NULL, ","));
   strcpy(lat, strtok(NULL, ","));
   strcpy(lon, strtok(NULL, ","));
+  strcpy(spd, strtok(NULL, ","));
 
   Serial.print(F("Date/Time: ")); Serial.println(date);
   Serial.print(F("Latitude : ")); Serial.println(lat);
@@ -187,17 +270,16 @@ void getSendGPS() {
   modem.getBattStats(chargeState, percent, milliVolts);
   char cpercent[4];
 
-  char data[48];
-  strcpy(data, deviceID);
-  strcat(data, ",");
-  strcat(data, lat);
-  strcat(data, ",");
-  strcat(data, lon);
-  strcat(data, ",");
-  strcat(data, itoa(percent, cpercent, 10));
+  strcpy(dataGPS, deviceID);
+  strcat(dataGPS, ",");
+  strcat(dataGPS, lat);
+  strcat(dataGPS, ",");
+  strcat(dataGPS, lon);
+  strcat(dataGPS, ",");
+  strcat(dataGPS, itoa(percent, cpercent, 10));
 
-  Serial.println(data);
-  mqtt.publish(topicNdoware, data);
+  Serial.println(dataGPS);
+//  mqtt.publish("coba/aja", dataGPS);
 }
 
 void setup() {
@@ -205,15 +287,15 @@ void setup() {
   SerialMon.begin(38400);
   delay(10);
 
-  pinMode(RELAY_PIN11, OUTPUT);
-  pinMode(RELAY_PIN12, OUTPUT);
-  pinMode(RELAY_PIN13, OUTPUT);
-  pinMode(RELAY_PIN14, OUTPUT);
+  pinMode(RELAY_PIN1, OUTPUT);
+  pinMode(RELAY_PIN2, OUTPUT);
+  pinMode(RELAY_PIN3, OUTPUT);
+  pinMode(RELAY_PIN4, OUTPUT);
 
-  digitalWrite(RELAY_PIN11, relay1Status);
-  digitalWrite(RELAY_PIN12, relay2Status);
-  digitalWrite(RELAY_PIN13, relay3Status);
-  digitalWrite(RELAY_PIN14, relay4Status);
+  digitalWrite(RELAY_PIN1, relay1Status);
+  digitalWrite(RELAY_PIN2, relay2Status);
+  digitalWrite(RELAY_PIN3, relay3Status);
+  digitalWrite(RELAY_PIN4, relay4Status);
 
   // !!!!!!!!!!!
   // Set your reset, enable, power pins here
@@ -232,8 +314,8 @@ void setup() {
   delay(3000);
 
   SerialMon.println(F(">>> INISIALISASI MODEM....."));
-  //  modem.restart();
-  modem.init();
+  modem.restart();
+  //  modem.init();
 
   String modemInfo = modem.getModemInfo();
   SerialMon.print(F("- Modem Info: "));
@@ -301,23 +383,57 @@ void loop() {
   readSensorV1();
   readSensorV2();
 
-  // GPS data every 60 secons
+  //   GPS data every 60 secons
   unsigned long t = millis();
   if (t - lastGetGPStAttempt > 60000L) {
     lastGetGPStAttempt = t;
     getSendGPS();
   }
 
-//  if (t - waktuAkhirSensorV > 1000L) {
-//    waktuAkhirSensorV = t;
-//    Serial.print(F("Sensor V1 VAL : ")); Serial.println(SENS1_VAL);
-//    Serial.print(F("Sensor V1 IN : ")); Serial.println(SENS1_IN);
-//    Serial.print(F("Sensor V1 OUT : ")); Serial.println(SENS1_OUT);
-//    Serial.println(F("============================================"));
-//    Serial.print(F("Sensor V2 VAL : ")); Serial.println(SENS2_VAL);
-//    Serial.print(F("Sensor V2 IN : ")); Serial.println(SENS2_IN);
-//    Serial.print(F("Sensor V2 OUT : ")); Serial.println(SENS2_OUT);
-//  }
+  if (status_kunci == 1) {
+
+    digitalWrite(RELAY_PIN1, 0);
+    relay1Status = LOW;
+   
+    //    ==================  NOTIFIKASI SENSOR 1 (KUNCI KONTAK) =====================
+    if (SENS1_VAL == 0) {
+      if (SENS1_STAT) {
+//        Serial.println(F("SENSOR 1 DICABUT"));
+        mqtt.publish("whatsapp/notifikasi", "aki");
+        SENS1_STAT = !SENS1_STAT;
+      }
+    }
+
+    //   ===================== NOTIFIKASI SENSOR 2 (KUNCI KONTAK) ======================
+    if (SENS2_VAL > 0) {
+      if (SENS2_STAT) {
+//        Serial.println(F("KUNCI KONTAK MENYALA"));
+        mqtt.publish("whatsapp/notifikasi", "kunci_kontak");
+        SENS2_STAT = !SENS2_STAT;
+      }
+    }
+
+    //   ===================== NOTIFIKASI SENSOR GETAR (KUNCI KONTAK) ======================
+    sens_getar_val = digitalRead(PIN_SENS_GETAR);
+    if (sens_getar_val == 1) {
+      if (kirim_notifGetar) {
+//        Serial.println(F("ADA GETARAN"));
+        mqtt.publish("whatsapp/notifikasi", "getar");
+        kirim_notifGetar = !kirim_notifGetar;
+      }
+    }
+  }
+
+  //  if (t - waktuAkhirSensorV > 1000L) {
+  //    waktuAkhirSensorV = t;
+  //    Serial.print(F("Sensor V1 VAL : ")); Serial.println(SENS1_VAL);
+  //    Serial.print(F("Sensor V1 IN : ")); Serial.println(SENS1_IN);
+  //    Serial.print(F("Sensor V1 OUT : ")); Serial.println(SENS1_OUT);
+  //    Serial.println(F("============================================"));
+  //    Serial.print(F("Sensor V2 VAL : ")); Serial.println(SENS2_VAL);
+  //    Serial.print(F("Sensor V2 IN : ")); Serial.println(SENS2_IN);
+  //    Serial.print(F("Sensor V2 OUT : ")); Serial.println(SENS2_OUT);
+  //  }
 
   mqtt.loop();
 }

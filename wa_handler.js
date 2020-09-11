@@ -104,7 +104,7 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
             })
             console.log(payload.toString());
 
-            mqttController.publish(mqttClient,"whatsapp/out",payload)
+            mqttController.publish(mqttClient, "whatsapp/out/lokasi", "lokasi")
           break;
 
         case '/kunci':
@@ -125,7 +125,7 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
               }
             })
 
-            mqttController.publish(mqttClient, "whatsapp/out", payload)
+            mqttController.publish(mqttClient, "whatsapp/out/kunci", kunci)
           break;
 
         case '/mesin':
@@ -141,12 +141,10 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
               from: from,
               perintah: "mesin",
               deviceID: pengguna.no_perangkat,
-              value: {
-                mesin: mesin
-              }
+              value: mesin        
             })
 
-            mqttController.publish(mqttClient, "whatsapp/out", payload)
+            mqttController.publish(mqttClient, "whatsapp/out/mesin", mesin)
           break;
 
         case '/status':
@@ -165,7 +163,7 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
               value: {}
             })
 
-            mqttController.publish(mqttClient, "whatsapp/out", payload)
+            mqttController.publish(mqttClient, "whatsapp/out/status", payload)
           break;
       }
     }else{

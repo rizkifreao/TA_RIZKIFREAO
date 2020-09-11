@@ -74,8 +74,11 @@ const start = async (client) => {
     // })
   })
 
-  mqtt_controller.subscribe(mqttClient, "Notifikasi")
-  mqtt_controller.subscribe(mqttClient, "whatsapp/in")
+  mqtt_controller.subscribe(mqttClient, "whatsapp/notifikasi")
+  mqtt_controller.subscribe(mqttClient, "whatsapp/in/mesin")
+  mqtt_controller.subscribe(mqttClient, "whatsapp/in/kunci")
+  mqtt_controller.subscribe(mqttClient, "whatsapp/in/status")
+  mqtt_controller.subscribe(mqttClient, "whatsapp/in/lokasi")
 
 
   // mqtt_controller.subscribe(mqttClient, "Notifikasi")
