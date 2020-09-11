@@ -111,18 +111,26 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
 
   if (topic == "whatsapp/notifikasi") {
     var callback = ""
-    if (msg == "aki") {
-      callback = "*==== PERINGATAN ====*\n\n"+
-      "\`\`\`Sensor mendeteksi bahwa aki baterai telah dilepas, Segera periksa kendaraan anda\`\`\`"
-    } else if (msg == "kunci_kontak"){
+    // if (msg == "aki") {
+    //   callback = "*==== PERINGATAN ====*\n\n"+
+    //   "\`\`\`Sensor mendeteksi bahwa aki baterai telah dilepas, Segera periksa kendaraan anda\`\`\`"
+    // } else 
+    if (msg == "kunci_kontak"){
       callback = "*==== PERINGATAN ====*\n\n" +
         "\`\`\`Sensor mendeteksi kunci kontak dinyalakan, Segera periksa kendaraan anda\`\`\`"
+          setTimeout(function () {
+            await whatsapp.sendText(payload.from, callback)
+          }, 7000);
+          break;
     } else if (msg == "getar"){
       callback = "*==== PERINGATAN ====*\n\n" +
         "\`\`\`Sensor mendeteksi adanya gerakan pada kendaraan anda, Segera periksa kendaraan anda\`\`\`"
+
+        await whatsapp.sendText(payload.from, callback)
+        break;
     }
 
-    await whatsapp.sendText(payload.from, callback)
+    
   }
   console.log(msg);
 }
