@@ -109,7 +109,7 @@ const start = async (client) => {
 }
 
 app.get('/',(req,res)=>{
-  res.send("<h1> Selamat datang di Whatsapp MQTT Api ... </h1>")
+  res.send("<h1> Selamat datang di Whatsapp MQTT Api ... </h1><br><br><p> Credit : Rizki Pebrianto <p>")
 })
 
 create(serverOption).then(async client => await start(client))
