@@ -117,20 +117,19 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
     // } else 
     if (msg == "kunci_kontak"){
       callback = "*==== PERINGATAN ====*\n\n" +
-        "\`\`\`Sensor mendeteksi kunci kontak dinyalakan, Segera periksa kendaraan anda\`\`\`"
+        "\`\`\`Sensor mendeteksi kunci kontak dinyalakan, Segera periksa kendaraan anda\`\`\`"  
           setTimeout(function () {
-            await whatsapp.sendText(payload.from, callback)
-          }, 7000);
-          break;
+            console.log("HAHA");
+            whatsapp.sendText(payload.from, callback)
+            // break;
+          }, 5000);
+        
     } else if (msg == "getar"){
       callback = "*==== PERINGATAN ====*\n\n" +
         "\`\`\`Sensor mendeteksi adanya gerakan pada kendaraan anda, Segera periksa kendaraan anda\`\`\`"
-
         await whatsapp.sendText(payload.from, callback)
-        break;
-    }
 
-    
+    }
   }
   console.log(msg);
 }
