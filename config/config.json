@@ -2,21 +2,21 @@
   "development": {
     "username": "root",
     "password": "Materoot404!",
-    "database": "db_smart_kendaraan",
+    "database": "kendaraan",
     "host": "157.230.35.21",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
     "password": "Materoot404!",
-    "database": "db_smart_kendaraan",
+    "database": "kendaraan",
     "host": "157.230.35.21",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
     "password": "Materoot404!",
-    "database": "db_smart_kendaraan",
+    "database": "kendaraan",
     "host": "157.230.35.21",
     "dialect": "mysql"
   }
