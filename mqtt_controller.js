@@ -44,24 +44,24 @@ Mqtt_Controller.subscribe = (client,topic) => {
 Mqtt_Controller.callback = async (topic, message, whatsapp) => {
   var msg = message.toString();
   var payload = {
-    from: "6283101194384@c.us"
+    from: "6289664652474@c.us"
   }
 
   switch (topic) {
     // example
-    // {"from":"6283101194384@c.us","perintah":"status","value":{"lat":"-6","lng":"100","loc":"Bandung"}}
+    // {"from":"6289664652474@c.us","perintah":"status","value":{"lat":"-6","lng":"100","loc":"Bandung"}}
     case "whatsapp/in/lokasi":
       var value = msg.split(",")
       var callback = "*==== SUKSES ====*\n\n"+
       "\`\`\`Latitude : "+value[1]+"\`\`\`\n"+
       "\`\`\`Laogtitude : "+ value[2] + "\`\`\`\n"
 
-      await whatsapp.sendText("6283101194384@c.us", callback)
-      await whatsapp.sendLocation("6283101194384@c.us", value[1], value[2], "")
+      await whatsapp.sendText("6289664652474@c.us", callback)
+      await whatsapp.sendLocation("6289664652474@c.us", value[1], value[2], "")
     break;
 
     case "whatsapp/in/mesin":
-       // {"from":"6283101194384@c.us","perintah":"mesin","value":{"relay":"0"}}
+       // {"from":"6289664652474@c.us","perintah":"mesin","value":{"relay":"0"}}
       var callback = ""
 
       if (msg == "0") {
@@ -78,7 +78,7 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
     break;
 
     case "whatsapp/in/kunci":
-      // {"from":"6283101194384@c.us","perintah":"kunci","value":{"kunci":"1"}}
+      // {"from":"6289664652474@c.us","perintah":"kunci","value":{"kunci":"1"}}
       var callback = ""
 
       if (msg == "1") {
@@ -95,7 +95,7 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
     break;
 
     case "whatsapp/in/status":
-      // {"from":"6283101194384@c.us","perintah":"status","value":{"kunci":"1","mesin":"1","lat":"1","lng":"1","batt":"1"}}
+      // {"from":"6289664652474@c.us","perintah":"status","value":{"kunci":"1","mesin":"1","lat":"1","lng":"1","batt":"1"}}
       var value = payload.value
       var callback = callback = "*Status Informasi*\n\n" +
         "\`\`\`Keamanan : 1\`\`\`\n" +

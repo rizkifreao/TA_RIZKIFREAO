@@ -18,7 +18,8 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
     const cmds = commands.map(x => x + '\\b').join('|')
     const cmd = type === 'chat' ? body.match(new RegExp(cmds, 'gi')) : type === 'image' && caption ? caption.match(new RegExp(cmds, 'gi')) : ''
     
-    if (cmd && !isGroupMsg) {
+    if (cmd) {
+    // if (cmd && !isGroupMsg) {
       if (!isGroupMsg) console.log('[EXEC]', color(time, 'yellow'), color(cmd[0]), 'from', color(pushname))
       if (isGroupMsg) console.log('[EXEC]', color(time, 'yellow'), color(cmd[0]), 'from', color(pushname), 'in', color(name))
       const args = body.trim().split(' ')
