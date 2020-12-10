@@ -103,7 +103,7 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
       var callback = callback = "*Status Informasi*\n\n" +
        
         "\`\`\`Latitude : \`\`\`" + `${lang}\n` +
-        "\`\`\`Longtitude : 1\`\`\`" + `${lat}\n` +
+        "\`\`\`Longtitude : \`\`\`" + `${lat}\n` +
         "\`\`\`Batterai : 84%\`\`\`\n" +
         `\`\`\`http://maps.google.com/maps?q=${lang},${lat}\`\`\``;
 
