@@ -157,6 +157,8 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
               break;
             }
 
+            mqttController.callback('whatsapp/in/status',"",whatsapp)
+
             var payload = JSON.stringify({
               from: from,
               perintah: "status",
@@ -164,7 +166,7 @@ WA_Controller.msgHandler = async (whatsapp, message, mqttClient) => {
               value: {}
             })
 
-            mqttController.publish(mqttClient, "whatsapp/out/status", payload)
+            // mqttController.publish(mqttClient, "whatsapp/out/status", payload)
           break;
       }
     }else{

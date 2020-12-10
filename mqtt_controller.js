@@ -43,6 +43,7 @@ Mqtt_Controller.subscribe = (client,topic) => {
 
 Mqtt_Controller.callback = async (topic, message, whatsapp) => {
   var msg = message.toString();
+  var lang = "", lat = "", batt = "";
   var payload = {
     from: "6283101194384@c.us"
   }
@@ -52,6 +53,9 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
     // {"from":"6283101194384@c.us","perintah":"status","value":{"lat":"-6","lng":"100","loc":"Bandung"}}
     case "whatsapp/in/lokasi":
       var value = msg.split(",")
+      lang = value[1];
+      lat = value[2];
+      batt = value[3].split("-")[0];
       var callback = "*==== SUKSES ====*\n\n"+
       "\`\`\`Latitude : "+value[1]+"\`\`\`\n"+
       "\`\`\`Laogtitude : "+ value[2] + "\`\`\`\n"
@@ -98,14 +102,13 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
       // {"from":"6283101194384@c.us","perintah":"status","value":{"kunci":"1","mesin":"1","lat":"1","lng":"1","batt":"1"}}
       var value = payload.value
       var callback = callback = "*Status Informasi*\n\n" +
-        "\`\`\`Keamanan : 1\`\`\`\n" +
-        "\`\`\`Mesin : 1\`\`\`\n" +
-        "\`\`\`Latitude : 1\`\`\`\n" +
-        "\`\`\`Longtitude : 1\`\`\`\n" +
-        "\`\`\`Batterai : 1\`\`\`\n" +
-        "\`\`\`http://maps.google.com/maps?q=lat,long\`\`\`"
+       
+        "\`\`\`Latitude : \`\`\`" + `${lang}\n` +
+        "\`\`\`Longtitude : 1\`\`\`" + `${lat}\n` +
+        "\`\`\`Batterai : 84%\`\`\`\n" +
+        `\`\`\`http://maps.google.com/maps?q=${lang},${lat}\`\`\``;
 
-      await whatsapp.sendText(payload.from, callback)
+      await whatsapp.sendText("6283101194384@c.us", callback)
     break;
   }
 
