@@ -43,7 +43,7 @@ Mqtt_Controller.subscribe = (client,topic) => {
 
 Mqtt_Controller.callback = async (topic, message, whatsapp) => {
   var msg = message.toString();
-  var lang = "", lat = "", batt = "";
+  var lang, lat;
   var payload = {
     from: "6283101194384@c.us"
   }
@@ -55,7 +55,6 @@ Mqtt_Controller.callback = async (topic, message, whatsapp) => {
       var value = msg.split(",")
       lang = value[1];
       lat = value[2];
-      batt = value[3].split("-")[0];
       var callback = "*==== SUKSES ====*\n\n"+
       "\`\`\`Latitude : "+value[1]+"\`\`\`\n"+
       "\`\`\`Laogtitude : "+ value[2] + "\`\`\`\n"
