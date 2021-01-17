@@ -63,10 +63,6 @@ const start = async (client) => {
     console.log(`\n• Listening on port ${PORT}!`);
   });
 
-  app.get('/send',(req,res)=>{
-    res.send("TEST");
-  })
-
   // ============= MQTTT =================
   mqttClient.on('connect', (res) => {
     // console.log("MQTT INIT");
@@ -119,6 +115,10 @@ app.get('/',(req,res)=>{
 app.post('/',(req,res)=>{
   
 })
+
+  app.get('/send', (req, res) => {
+    res.send("TEST");
+  })
 
 create(serverOption).then(async client => await start(client))
   .catch(e => {
