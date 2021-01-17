@@ -63,6 +63,10 @@ const start = async (client) => {
     console.log(`\n• Listening on port ${PORT}!`);
   });
 
+  app.get('/send',(req,res)=>{
+    res.send("TEST");
+  })
+
   // ============= MQTTT =================
   mqttClient.on('connect', (res) => {
     // console.log("MQTT INIT");
@@ -110,6 +114,10 @@ const start = async (client) => {
 
 app.get('/',(req,res)=>{
   res.send("<h1> Selamat datang di Whatsapp MQTT Api ... </h1><br><br><p> Credit : Team IoT LPKIA <p>")
+})
+
+app.post('/',(req,res)=>{
+  
 })
 
 create(serverOption).then(async client => await start(client))
